@@ -1,0 +1,14 @@
+{
+  // Type-checking only for the build-tooling files. It emits nothing: `tsc -b` used
+  // to drop a compiled vite.config.js in the repo root, which then SHADOWED
+  // vite.config.ts (vite prefers the .js), so a stale build config could silently
+  // win over the real one.
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts", "electron-builder.config.js"]
+}

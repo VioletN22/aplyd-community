@@ -1,0 +1,122 @@
+name: Desktop checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: mac
+            arch: arm64
+          - os: macos-15-intel
+            target: mac
+            arch: x64
+          - os: windows-latest
+            target: win
+            arch: x64
+          - os: ubuntu-latest
+            target: linux
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      # Advisory only: a new upstream CVE should not block an unrelated release.
+      # It still prints findings in the log. Run `npm audit` locally to triage.
+      - name: npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      - run: npm run privacy:check
+      - run: npm test
+      - run: python -m unittest discover -s tools/tests -v
+      - run: npm run build
+      - name: Install Linux native smoke dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends dbus gnome-keyring libsecret-1-0 libglib2.0-bin xvfb xauth
+      - name: Configure Linux Chromium sandbox helper
+        if: runner.os == 'Linux'
+        run: |
+          node -e "require('electron')"
+          sudo chown root:root node_modules/electron/dist/chrome-sandbox
+          sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
+      - name: Native core smoke (macOS / Windows)
+        if: runner.os != 'Linux'
+        run: node scripts/smoke-core.cjs --report native-smoke.json
+      - name: Native core smoke (Linux insecure fallback rejected)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a node scripts/smoke-core.cjs --password-store=basic --require-insecure-rejection --report native-smoke-linux-fallback.json
+      - name: Native core smoke (Linux GNOME Keyring round trip)
+        if: runner.os == 'Linux' && !cancelled()
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A separate session bus cannot connect to the runner's desktop keyring.
+          # See https://dbus.freedesktop.org/doc/dbus-run-session.1.html
+          dbus-run-session -- bash <<'KEYRING_SMOKE'
+          set -euo pipefail
+          umask 077
+          keyring_root=$(mktemp -d "${RUNNER_TEMP}/aplyd-keyring.XXXXXX")
+          keyring_pid=''
+          cleanup() {
+            if [[ -n "$keyring_pid" ]]; then
+              kill "$keyring_pid" 2>/dev/null || true
+              wait "$keyring_pid" 2>/dev/null || true
+            fi
+            rm -rf -- "$keyring_root"
+          }
+          trap cleanup EXIT
+          export XDG_DATA_HOME="$keyring_root/data"
+          export XDG_CONFIG_HOME="$keyring_root/config"
+          export XDG_CACHE_HOME="$keyring_root/cache"
+          export XDG_RUNTIME_DIR="$keyring_root/runtime"
+          export GNOME_KEYRING_CONTROL="$keyring_root/control"
+          export XDG_CURRENT_DESKTOP=GNOME
+          # Precreate keyrings so GNOME cannot fall back to a legacy home directory.
+          mkdir -p "$XDG_DATA_HOME/keyrings" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_RUNTIME_DIR" "$GNOME_KEYRING_CONTROL"
+          # --unlock reads stdin and creates this new login keyring. This fixed
+          # password belongs only to the disposable CI fixture, never a user.
+          # See GNOME docs/gnome-keyring-daemon.xml for --unlock/--foreground.
+          gnome-keyring-daemon --foreground --unlock --components=secrets --control-directory="$GNOME_KEYRING_CONTROL" \
+            < <(printf '%s' 'aplyd-disposable-ci-keyring') >"$keyring_root/daemon.log" 2>&1 &
+          keyring_pid=$!
+          gdbus wait --session --timeout 10 org.freedesktop.secrets
+          locked=$(gdbus call --session --dest org.freedesktop.secrets \
+            --object-path /org/freedesktop/secrets/collection/login \
+            --method org.freedesktop.DBus.Properties.Get org.freedesktop.Secret.Collection Locked)
+          [[ "$locked" == '(<false>,)' ]] || { cat "$keyring_root/daemon.log"; exit 1; }
+          xvfb-run -a node scripts/smoke-core.cjs --password-store=gnome-libsecret --require-secure-storage --report native-smoke-linux-keyring.json
+          KEYRING_SMOKE
+      - run: npx electron-builder --config electron-builder.config.js --${{ matrix.target }} --${{ matrix.arch }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aplyd-${{ matrix.target }}-${{ matrix.arch }}
+          path: |
+            native-smoke*.json
+            release.noindex/*.dmg
+            release.noindex/*.zip
+            release.noindex/*.exe
+            release.noindex/*.AppImage
+            release.noindex/*.deb
+            release.noindex/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14

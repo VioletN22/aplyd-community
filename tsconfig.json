@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020"],
+    "module": "CommonJS",
+    "skipLibCheck": true,
+
+    /* Output */
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    /* Type checking */
+    "isolatedModules": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/main/**/*", "src/shared/**/*"],
+  // Tests have their own pipeline (vitest, vitest.config.ts). Compiling them here
+  // would put a __tests__ directory inside dist/main, and from there into the asar.
+  "exclude": ["src/renderer/**/*", "src/main/__tests__/**/*", "node_modules"]
+}

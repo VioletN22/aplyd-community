@@ -1,0 +1,32 @@
+module.exports = {
+  appId: 'io.github.VioletN22.aplyd-community',
+  productName: 'Aplyd Community',
+  directories: { buildResources: 'assets', output: 'release.noindex' },
+  artifactName: 'Aplyd-Community-${version}-${os}-${arch}.${ext}',
+  files: [
+    'dist/main/**/*', 'dist/renderer/**/*', 'dist/shared/**/*', 'package.json', 'LICENSE',
+    '!dist/**/__tests__/**', '!dist/**/*.map', '!dist/**/*.d.ts',
+    '!node_modules/pdf-parse/test/**',
+    '!node_modules/pdf-parse/lib/pdf.js/v1.10.88/**',
+    '!node_modules/pdf-parse/lib/pdf.js/v1.9.426/**',
+    '!node_modules/pdf-parse/lib/pdf.js/v2.0.550/**',
+  ],
+  asarUnpack: ['node_modules/better-sqlite3/**/*'],
+  mac: {
+    icon: 'assets/icon.icns', category: 'public.app-category.productivity', identity: '-',
+    extendInfo: { NSAppleEventsUsageDescription: 'Aplyd Community reads the current browser tab address only when you use Quick Add.' },
+    target: ['dmg', 'zip'],
+  },
+  win: { target: ['nsis', 'zip'], icon: 'assets/icon.png' },
+  nsis: { oneClick: false, allowToChangeInstallationDirectory: true, perMachine: false },
+  linux: { target: ['deb', 'AppImage', 'tar.gz'], icon: 'assets/icon.png', category: 'Office', maintainer: 'VioletN22 <145524537+VioletN22@users.noreply.github.com>' },
+  extraResources: [
+    { from: 'assets', to: 'assets' },
+    { from: 'THIRD_PARTY_NOTICES.txt', to: 'licenses/THIRD_PARTY_NOTICES.txt' },
+    { from: 'src/renderer/assets/fonts/Figtree-OFL.txt', to: 'licenses/Figtree-OFL.txt' },
+    { from: 'skills', to: 'community/skills' },
+    { from: 'tools', to: 'community/tools', filter: ['*.py'] },
+    { from: 'scripts/install-skills.py', to: 'community/scripts/install-skills.py' },
+  ],
+  publish: null,
+};

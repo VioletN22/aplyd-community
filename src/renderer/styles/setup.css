@@ -1,0 +1,57 @@
+/* Setup follows the workspace's Figtree, white, slate and blue palette. */
+.setup-shell { max-width: 1100px; margin: 0 auto; padding: 20px 36px 40px; }
+.setup-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+.setup-top strong { font-size: 17px; }
+.setup-layout { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 48px; padding-top: 32px; }
+.setup-steps ol { padding: 0; margin: 0; list-style: none; }
+.setup-steps li { margin: 0 0 5px; }
+.setup-steps button { display: flex; align-items: center; width: 100%; gap: 12px; padding: 10px 8px; border: 0; background: transparent; box-shadow: none; text-align: left; font-weight: 500; }
+.setup-steps button[aria-current="step"] { background: var(--accent-tint); color: var(--accent); }
+.setup-step-number { display: grid; place-items: center; width: 24px; height: 24px; flex: 0 0 24px; border: 1px solid var(--line-2); border-radius: 50%; font-size: 12px; }
+.setup-steps button[aria-current="step"] .setup-step-number { border-color: var(--accent); }
+.setup-steps small, .setup-review small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; margin-top: 3px; }
+.setup-steps > p { font-size: 12px; line-height: 1.7; color: var(--muted); margin: 24px 8px; }
+.setup-main { min-width: 0; }
+.setup-heading { margin-bottom: 24px; }
+.setup-position { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
+.setup-heading h1 { font-size: 30px; line-height: 1.15; letter-spacing: -0.7px; margin: 0 0 14px; scroll-margin-top: 24px; }
+.setup-heading h1:focus { outline: none; }
+.setup-heading > p:last-child { font-size: 15px; line-height: 1.6; color: var(--soft); max-width: 62ch; }
+.setup-body { font-size: 13px; line-height: 1.6; }
+.setup-body h2 { font-size: 17px; line-height: 1.4; margin: 24px 0 10px; }
+.setup-start { border-left: 3px solid var(--accent); background: var(--panel); padding: 18px 22px; margin-bottom: 24px; }
+.setup-start h2 { margin: 0 0 8px; }
+.setup-start p { margin-bottom: 14px; }
+.setup-feature-list { list-style: none; padding: 0; margin: 0; }
+.setup-feature-list li { display: grid; grid-template-columns: 140px 1fr; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.setup-feature-list span { color: var(--muted); }
+.setup-note { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 18px 0; }
+.setup-help { margin: 14px 0; border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
+.setup-help summary { font-weight: 600; cursor: pointer; }
+.setup-help p, .setup-help ol, .setup-help ul { margin: 12px 0 0; }
+.setup-help ol, .setup-help ul { padding-left: 20px; }
+.setup-help li { margin-bottom: 10px; }
+.setup-body code { font-size: 12px; overflow-wrap: anywhere; }
+.setup-copy { padding: 12px; background: var(--panel); border-radius: 5px; margin: 10px 0; }
+.setup-copy code { display: block; white-space: pre-wrap; margin-bottom: 10px; user-select: text; }
+.setup-copy span { font-size: 12px; margin-left: 10px; }
+.setup-review { list-style: none; padding: 0; margin: 0; }
+.setup-review li { display: flex; align-items: center; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.setup-review li > span { flex: 1; }
+.setup-footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; }
+.setup-footer > div { display: flex; gap: 10px; }
+.settings-setup-entry { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px; background: var(--panel); border-radius: 8px; margin-bottom: 16px; }
+.settings-setup-entry p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.settings-jump { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+.settings-shell > section[id^="settings-section"] { scroll-margin-top: 20px; margin-bottom: 24px; }
+@media (max-width: 800px) {
+  .setup-shell { padding: 14px 20px 28px; }
+  .setup-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .setup-steps ol { display: flex; flex-wrap: wrap; gap: 4px; }
+  .setup-steps li { margin: 0; }
+  .setup-steps button { width: auto; font-size: 12px; gap: 6px; }
+  .setup-steps small, .setup-steps > p { display: none; }
+  .setup-heading h1 { font-size: 27px; }
+  .setup-feature-list li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .settings-setup-entry { align-items: flex-start; flex-direction: column; }
+}

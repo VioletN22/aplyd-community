@@ -1,0 +1,66 @@
+{
+  "name": "aplyd-community",
+  "version": "0.3.0",
+  "description": "Job application tracker",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:vite\" \"wait-on http://localhost:5173 && npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "npm run build:electron && electron dist/main/index.js --dev",
+    "build": "npm run typecheck:renderer && npm run build:vite && npm run build:electron",
+    "build:vite": "vite build",
+    "build:electron": "tsc",
+    "pack": "electron-builder --config electron-builder.config.js --dir",
+    "dist": "electron-builder --config electron-builder.config.js",
+    "test": "vitest run",
+    "typecheck:renderer": "tsc -p tsconfig.renderer.json",
+    "start": "npm run build && electron dist/main/index.js",
+    "postinstall": "electron-builder install-app-deps",
+    "privacy:check": "node scripts/privacy-check.mjs",
+    "dist:mac": "npm run build && electron-builder --config electron-builder.config.js --mac --publish never",
+    "dist:win": "npm run build && electron-builder --config electron-builder.config.js --win --publish never",
+    "dist:linux": "npm run build && electron-builder --config electron-builder.config.js --linux --publish never"
+  },
+  "keywords": [],
+  "author": "VioletN22",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^13.2.0",
+    "imapflow": "^2.0.6",
+    "mailparser": "^3.9.28",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.4",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "concurrently": "^10.0.3",
+    "electron": "^45.3.3",
+    "electron-builder": "^26.15.2",
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.0.18",
+    "wait-on": "^9.0.10"
+  },
+  "productName": "Aplyd Community",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VioletN22/aplyd-community.git"
+  },
+  "homepage": "https://github.com/VioletN22/aplyd-community",
+  "overrides": {
+    "minimatch@9": "^11.0.8",
+    "minimatch@10": "^11.0.8"
+  }
+}
